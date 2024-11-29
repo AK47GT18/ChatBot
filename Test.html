@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        margin: 20px;
+        display: grid;
+        place-items: center;
+        background-image: url(pexels-felixmittermeier-956999.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    form {
+        border-radius: 6px;
+        background-color: rgba(0, 0, 0, 0.65);
+        height: 40rem;
+        width: 40rem;
+    }
+
+    .user-profile {
+        
+        padding-top: 0%;
+        height: 3.5rem;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.63);
+        color: white;
+        border-radius: 6px;
+        display: flex;
+        gap: 30px;
+        margin-bottom: 100px;
+    }
+
+    .user-profile label {
+        margin-top: 20px;
+        font-weight: bolder;
+        font-size: larger;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .user-img {
+        margin-top: 5px;
+        margin-left: 10px;
+        max-height: 50px;
+        max-width: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    #chat-form {
+        max-height: 90vh; 
+        overflow-y: auto; 
+        padding: 10px;
+        border-radius: 7px;
+
+       
+    }
+
+
+    .Bot-Bubble {
+        margin: 60px 5%;
+        background-color: #2A2A2A;
+        height: auto;
+        max-width: 60%;
+        padding: 10px;
+        border-radius: 7px;
+        color: aliceblue;
+        word-wrap: break-word;
+        position: relative; 
+    }
+
+    .Bot-Bubble label {
+        position: absolute;
+        bottom: 5px; 
+        right: 10px;  
+        font-size: 0.8rem;
+        color: #aaa;  
+    }
+
+    .User-Bubble {
+        margin: 20px;
+        margin-left: 30%;
+        background-color: #128C7E;
+        color: aliceblue;
+        height: auto;
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 7px;
+        word-wrap: break-word;
+        position: relative; 
+    }
+
+    .User-Bubble label {
+        position: absolute;
+        bottom: 5px;  
+        right: 10px;  
+        font-size: 0.8rem;
+        color: #aaa;  
+    }
+
+    footer {
+        margin-top: -1px;
+        display: flex;
+        position: absolute;
+        background-color: #2A2A2A;
+        bottom: 23px;
+        margin-left: -10px;
+        border-radius: 8px;
+    }
+
+    footer input  {
+        padding-top: 10px;
+        font-size: large;
+        height: 6vh;
+        width: 76vh;
+        padding-left: 40px;
+        border: none;
+        color: aliceblue;
+        background-color: #2A2A2A;
+    }
+
+    footer input:focus {
+        outline: none;
+        background-color: #2A2A2A;
+    }
+
+    footer button {
+        border-radius: 7px;
+        background-image: url('send (2).png');
+        background-size: contain;
+        background-color: #2A2A2A;
+        background-repeat: no-repeat;
+        border: none;
+        width: 61px;
+        height: 60px;
+        cursor: pointer;
+    }
+
+    footer button:hover {
+        background-color: #444;
+    }
+
+    @media (max-width: 768px) {
+        form {
+            width: 100%;
+            height: auto;
+            margin: 10px;
+        }
+
+        footer textarea {
+            width: 100%;
+        }
+    }
+
+</style>
+<body>
+    <form method="post"   id="chat-form">
+        <nav class="user-profile">
+            <input class="user-img" type="image" src="3d6e67655ae590a9afd383962b434663.png" alt="user-pic">
+            <label>GUTS</label>
+        </nav>
+        <div id="chat-container">
+        </div>
+        <footer>
+            <input type="text" name="User-Message" id="User-Message" placeholder="Type a message">
+            <button type="submit" class="btn btn-primary" aria-label="Send message"></button>
+        </footer>
+    </form>
+</body>
+<script>
+    document.getElementById('chat-form').addEventListener('submit', function(e){
+       e.preventDefault();
+       const Message = document.getElementById('User-Message').value;
+       if( Message.trim() === "") return;
+
+       let userBubble = document.createElement('div');
+       userBubble.classList.add('User-Bubble');
+       userBubble.innerHTML = `<p> ${Message} </p> <label>${getCurrentTime()}</label>`;
+
+         document.getElementById('chat-container').appendChild(userBubble);
+
+        
+         document.getElementById('User-Message').value = "";
+ 
+         fetch('chatbot.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ Message: Message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            
+            let BotBubble = document.createElement('div');
+            BotBubble.classList.add('Bot-Bubble');
+            BotBubble.innerHTML = `<p> ${data.response} </p> <label>${getCurrentTime()}</label>`;
+     
+            document.getElementById('chat-container').appendChild(BotBubble);
+     
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        })
+        .catch(error => console.error('Error:', error));
+     
+    });
+    function getCurrentTime() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minutes}`;
+    }
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*  document.getElementById('chat-form').addEventListener('submit', function(e) {
+        e.preventDefault(); 
+
+        let userMessage = document.getElementById('User-Message').value;
+        if (userMessage.trim() === "") return; 
+
+        
+        let userBubble = document.createElement('div');
+        userBubble.classList.add('User-Bubble');
+        userBubble.innerHTML = `<p>${userMessage}</p><label>${getCurrentTime()}</label>`;
+
+        document.getElementById('chat-container').appendChild(userBubble);
+
+        let botBubble = document.createElement('div');
+        botBubble.classList.add('Bot-Bubble');
+        botBubble.innerHTML = `<p>Bot: I received your message, "${userMessage}".</p><label>${getCurrentTime()}</label>`;
+
+
+        document.getElementById('chat-container').appendChild(botBubble);
+
+ 
+        document.getElementById('User-Message').value = '';
+
+       
+        document.getElementsByid('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+    });
+    function getCurrentTime() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minutes}`;
+    }*/
+</script>
+</html>
